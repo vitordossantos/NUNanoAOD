@@ -201,6 +201,22 @@ class ZZProducer(Module):
                    "2017": {"loose": 0.0521, "medium": 0.3033, "tight": 0.7489},
                    "2018": {"loose": 0.0494, "medium": 0.2770, "tight": 0.7264}}
         return dict_wp[self.era][wp]
+    
+    def CvsLbtag_id(self, wp):
+        # using deepjet
+        # ref : https://twiki.cern.ch/twiki/bin/view/CMS/BtagRecommendation
+        dict_wp = {"2016": {"loose": 0.038, "medium": 0.099, "tight": 0.282},
+                   "2017": {"loose": 0.038, "medium": 0.099, "tight": 0.282},
+                   "2018": {"loose": 0.038, "medium": 0.099, "tight": 0.282}}
+        return dict_wp[self.era][wp]
+    
+    def CvsBbtag_id(self, wp):
+        # using deepjet
+        # ref : https://twiki.cern.ch/twiki/bin/view/CMS/BtagRecommendation
+        dict_wp = {"2016": {"loose": 0.246, "medium": 0.325, "tight": 0.267},
+                   "2017": {"loose": 0.246, "medium": 0.325, "tight": 0.267},
+                   "2018": {"loose": 0.246, "medium": 0.325, "tight": 0.267}}
+        return dict_wp[self.era][wp]
 
 
     def met_filter(self, flag, filter_mask=True):
@@ -473,6 +489,7 @@ class ZZProducer(Module):
 
         good_jets  = []
         good_bjets = []
+        good_cjets = []  
         for jet in jets:
             if jet.pt < 30.0 or abs(jet.eta) > 4.7:
                 continue
@@ -483,11 +500,15 @@ class ZZProducer(Module):
             good_jets.append(jet)
             # Count b-tag with medium WP DeepJet
             # ref : https://twiki.cern.ch/twiki/bin/view/CMS/BtagRecommendation
-            if abs(jet.eta) <= 2.4 and jet.btagDeepFlavB > self.btag_id("loose"):
-                good_bjets.append(jet)
+            if abs(jet.eta) <= 2.4:
+                if jet.btagDeepFlavB > self.btag_id("medium"): 
+                    good_bjets.append(jet)    
+                 else jet.btagDeepFlavCvB > self.CvsBtag_id("medium") and jet.btagDeepFlavCvL > self.CvsLtag_id("medium"):
+                    good_cjets.append(jet)
 
         _ngood_jets = len(good_jets)
         _ngood_bjets = len(good_bjets)
+        _ngood_cjets = len(good_cjets)
         good_jets.sort(key=lambda jet: jet.pt, reverse=True)
         good_bjets.sort(key=lambda jet: jet.pt, reverse=True)
 
