@@ -503,7 +503,7 @@ class ZZProducer(Module):
             if abs(jet.eta) <= 2.4:
                 if jet.btagDeepFlavB > self.btag_id("medium"): 
                     good_bjets.append(jet)    
-                 else jet.btagDeepFlavCvB > self.CvsBtag_id("medium") and jet.btagDeepFlavCvL > self.CvsLtag_id("medium"):
+                elif jet.btagDeepFlavCvB > self.CvsBtag_id("medium") and jet.btagDeepFlavCvL > self.CvsLtag_id("medium"):
                     good_cjets.append(jet)
 
         _ngood_jets = len(good_jets)
